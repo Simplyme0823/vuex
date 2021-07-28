@@ -6,20 +6,27 @@ interface Logger
   log(message: string): void;
 }
 
-export interface LoggerOption<S> {
+export interface LoggerOption<State> {
   collapsed?: boolean;
   filter?: <P extends Payload>(
     mutation: P,
-    stateBefore: S,
-    stateAfter: S
+    stateBefore: State,
+    stateAfter: State
   ) => boolean;
-  transformer?: (state: S) => any;
-  mutationTransformer?: <P extends Payload>(mutation: P) => any;
-  actionFilter?: <P extends Payload>(action: P, state: S) => boolean;
-  actionTransformer?: <P extends Payload>(action: P) => any;
+  transformer?: (state: State) => any;
+  mutationTransformer?: <PayloadType extends Payload>(
+    mutation: PayloadType
+  ) => any;
+  actionFilter?: <PayloadType extends Payload>(
+    action: PayloadType,
+    state: State
+  ) => boolean;
+  actionTransformer?: <PayloadType extends Payload>(action: PayloadType) => any;
   logMutations?: boolean;
   logActions?: boolean;
   logger?: Logger;
 }
 
-export function createLogger<S>(option?: LoggerOption<S>): Plugin<S>;
+export function createLogger<State>(
+  option?: LoggerOption<State>
+): Plugin<State>;

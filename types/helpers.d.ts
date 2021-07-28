@@ -2,37 +2,39 @@ import { ComponentPublicInstance } from "vue";
 import { Dispatch, Commit } from "./index";
 
 type Computed = () => any;
-type InlineComputed<T extends Function> = T extends (...args: any[]) => infer R
-  ? () => R
+type InlineComputed<T extends Function> = T extends (
+  ...args: any[]
+) => infer ReturnType
+  ? () => ReturnType
   : never;
 type MutationMethod = (...args: any[]) => void;
 type ActionMethod = (...args: any[]) => Promise<any>;
 type InlineMethod<T extends (fn: any, ...args: any[]) => any> = T extends (
   fn: any,
   ...args: infer Args
-) => infer R
-  ? (...args: Args) => R
+) => infer ReturnType
+  ? (...args: Args) => ReturnType
   : never;
 type CustomVue = ComponentPublicInstance & Record<string, any>;
 
-interface Mapper<R> {
-  <Key extends string>(map: Key[]): { [K in Key]: R };
-  <Map extends Record<string, string>>(map: Map): { [K in keyof Map]: R };
+interface Mapper<Value> {
+  <Key extends string>(map: Key[]): { [K in Key]: Value };
+  <Map extends Record<string, string>>(map: Map): { [K in keyof Map]: Value };
 }
 
-interface MapperWithNamespace<R> {
-  <Key extends string>(namespace: string, map: Key[]): { [K in Key]: R };
+interface MapperWithNamespace<Value> {
+  <Key extends string>(namespace: string, map: Key[]): { [K in Key]: Value };
   <Map extends Record<string, string>>(namespace: string, map: Map): {
-    [K in keyof Map]: R;
+    [K in keyof Map]: Value;
   };
 }
 
 interface MapperForState {
   <
-    S,
+    State,
     Map extends Record<
       string,
-      (this: CustomVue, state: S, getters: any) => any
+      (this: CustomVue, state: State, getters: any) => any
     > = {}
   >(
     map: Map
@@ -41,10 +43,10 @@ interface MapperForState {
 
 interface MapperForStateWithNamespace {
   <
-    S,
+    State,
     Map extends Record<
       string,
-      (this: CustomVue, state: S, getters: any) => any
+      (this: CustomVue, state: State, getters: any) => any
     > = {}
   >(
     namespace: string,

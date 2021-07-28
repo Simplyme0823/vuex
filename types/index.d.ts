@@ -1,55 +1,53 @@
-import { App, WatchOptions, InjectionKey } from "vue";
-
-// augment typings of Vue.js
-import "./vue";
-
+import { App, InjectionKey, WatchOptions } from "vue";
 import {
-  mapState,
-  mapMutations,
-  mapGetters,
-  mapActions,
   createNamespacedHelpers,
+  mapActions,
+  mapGetters,
+  mapMutations,
+  mapState,
 } from "./helpers";
 import { createLogger } from "./logger";
+// augment typings of Vue.js
+import "./vue";
 
 export * from "./helpers";
 export * from "./logger";
 
-export declare class Store<S> {
-  constructor(options: StoreOptions<S>);
+export declare class Store<RootState> {
+  constructor(options: StoreOptions<RootState>);
 
-  readonly state: S;
+  readonly state: RootState;
   readonly getters: any;
 
   install(app: App, injectKey?: InjectionKey<Store<any>> | string): void;
 
-  replaceState(state: S): void;
+  replaceState(state: RootState): void;
 
   dispatch: Dispatch;
   commit: Commit;
 
-  subscribe<P extends MutationPayload>(
-    fn: (mutation: P, state: S) => any,
+  subscribe<Payload extends MutationPayload>(
+    fn: (mutation: Payload, state: RootState) => any,
     options?: SubscribeOptions
   ): () => void;
   subscribeAction<P extends ActionPayload>(
-    fn: SubscribeActionOptions<P, S>,
+    fn: SubscribeActionOptions<P, RootState>,
     options?: SubscribeOptions
   ): () => void;
   watch<T>(
-    getter: (state: S, getters: any) => T,
+    getter: (state: RootState, getters: any) => T,
     cb: (value: T, oldValue: T) => void,
     options?: WatchOptions
   ): () => void;
 
-  registerModule<T>(
+  registerModule<State>(
     path: string,
-    module: Module<T, S>,
+    module: Module<State, RootState>,
     options?: ModuleOptions
   ): void;
-  registerModule<T>(
+  registerModule<State>(
     path: string[],
-    module: Module<T, S>,
+    module: Module<State, RootState>,
     options?: ModuleOptions
   ): void;
 
@@ -60,40 +58,45 @@ export declare class Store<S> {
   hasModule(path: string[]): boolean;
 
   hotUpdate(options: {
-    actions?: ActionTree<S, S>;
-    mutations?: MutationTree<S>;
-    getters?: GetterTree<S, S>;
-    modules?: ModuleTree<S>;
+    actions?: ActionTree<RootState, RootState>;
+    mutations?: MutationTree<RootState>;
+    getters?: GetterTree<RootState, RootState>;
+    modules?: ModuleTree<RootState>;
   }): void;
 }
 
 export const storeKey: string;
 
-export function createStore<S>(options: StoreOptions<S>): Store<S>;
+export function createStore<RootState>(
+  options: StoreOptions<RootState>
+): Store<RootState>;
 
-export function useStore<S = any>(
-  injectKey?: InjectionKey<Store<S>> | string
-): Store<S>;
+export function useStore<RootState = any>(
+  injectKey?: InjectionKey<Store<RootState>> | string
+): Store<RootState>;
 
 export interface Dispatch {
   (type: string, payload?: any, options?: DispatchOptions): Promise<any>;
-  <P extends Payload>(
-    payloadWithType: P,
+  <PayloadType extends Payload>(
+    payloadWithType: PayloadType,
     options?: DispatchOptions
   ): Promise<any>;
 }
 
 export interface Commit {
   (type: string, payload?: any, options?: CommitOptions): void;
-  <P extends Payload>(payloadWithType: P, options?: CommitOptions): void;
+  <PayloadType extends Payload>(
+    payloadWithType: PayloadType,
+    options?: CommitOptions
+  ): void;
 }
 
-export interface ActionContext<S, R> {
+export interface ActionContext<State, RootState> {
   dispatch: Dispatch;
   commit: Commit;
-  state: S;
+  state: State;
   getters: any;
-  rootState: R;
+  rootState: RootState;
   rootGetters: any;
 }
 
@@ -113,22 +116,25 @@ export interface SubscribeOptions {
   prepend?: boolean;
 }
 
-export type ActionSubscriber<P, S> = (action: P, state: S) => any;
-export type ActionErrorSubscriber<P, S> = (
-  action: P,
-  state: S,
+export type ActionSubscriber<Action, State> = (
+  action: Action,
+  state: State
+) => any;
+export type ActionErrorSubscriber<Action, State> = (
+  action: Action,
+  state: State,
   error: Error
 ) => any;
 
-export interface ActionSubscribersObject<P, S> {
-  before?: ActionSubscriber<P, S>;
-  after?: ActionSubscriber<P, S>;
-  error?: ActionErrorSubscriber<P, S>;
+export interface ActionSubscribersObject<Action, State> {
+  before?: ActionSubscriber<Action, State>;
+  after?: ActionSubscriber<Action, State>;
+  error?: ActionErrorSubscriber<Action, State>;
 }
 
-export type SubscribeActionOptions<P, S> =
-  | ActionSubscriber<P, S>
-  | ActionSubscribersObject<P, S>;
+export type SubscribeActionOptions<Action, State> =
+  | ActionSubscriber<Action, State>
+  | ActionSubscribersObject<Action, State>;
 
 export interface DispatchOptions {
   root?: boolean;
@@ -139,64 +145,66 @@ export interface CommitOptions {
   root?: boolean;
 }
 
-export interface StoreOptions<S> {
-  state?: S | (() => S);
-  getters?: GetterTree<S, S>;
-  actions?: ActionTree<S, S>;
-  mutations?: MutationTree<S>;
-  modules?: ModuleTree<S>;
-  plugins?: Plugin<S>[];
+export interface StoreOptions<RootState> {
+  state?: RootState | (() => RootState);
+  getters?: GetterTree<RootState, RootState>;
+  actions?: ActionTree<RootState, RootState>;
+  mutations?: MutationTree<RootState>;
+  modules?: ModuleTree<RootState>;
+  plugins?: Plugin<RootState>[];
   strict?: boolean;
   devtools?: boolean;
 }
 
-export type ActionHandler<S, R> = (
-  this: Store<R>,
-  injectee: ActionContext<S, R>,
+export type ActionHandler<State, RootState> = (
+  this: Store<RootState>,
+  injectee: ActionContext<State, RootState>,
   payload?: any
 ) => any;
-export interface ActionObject<S, R> {
+export interface ActionObject<State, RootState> {
   root?: boolean;
-  handler: ActionHandler<S, R>;
+  handler: ActionHandler<State, RootState>;
 }
 
-export type Getter<S, R> = (
-  state: S,
+export type Getter<State, RootState> = (
+  state: State,
   getters: any,
-  rootState: R,
+  rootState: RootState,
   rootGetters: any
 ) => any;
-export type Action<S, R> = ActionHandler<S, R> | ActionObject<S, R>;
-export type Mutation<S> = (state: S, payload?: any) => any;
-export type Plugin<S> = (store: Store<S>) => any;
+export type Action<State, RootState> =
+  | ActionHandler<State, RootState>
+  | ActionObject<State, RootState>;
+export type Mutation<State> = (state: State, payload?: any) => any;
+export type Plugin<State> = (store: Store<State>) => any;
 
-export interface Module<S, R> {
+export interface Module<State, RootState> {
   namespaced?: boolean;
-  state?: S | (() => S);
-  getters?: GetterTree<S, R>;
-  actions?: ActionTree<S, R>;
-  mutations?: MutationTree<S>;
-  modules?: ModuleTree<R>;
+  state?: State | (() => State);
+  getters?: GetterTree<State, RootState>;
+  actions?: ActionTree<State, RootState>;
+  mutations?: MutationTree<State>;
+  modules?: ModuleTree<RootState>;
 }
 
 export interface ModuleOptions {
   preserveState?: boolean;
 }
 
-export interface GetterTree<S, R> {
-  [key: string]: Getter<S, R>;
+export interface GetterTree<State, RootState> {
+  [key: string]: Getter<State, RootState>;
 }
 
-export interface ActionTree<S, R> {
-  [key: string]: Action<S, R>;
+export interface ActionTree<State, RootState> {
+  [key: string]: Action<State, RootState>;
 }
 
-export interface MutationTree<S> {
-  [key: string]: Mutation<S>;
+export interface MutationTree<State> {
+  [key: string]: Mutation<State>;
 }
 
-export interface ModuleTree<R> {
-  [key: string]: Module<any, R>;
+export interface ModuleTree<RootState> {
+  [key: string]: Module<any, RootState>;
 }
 
 declare const _default: {
