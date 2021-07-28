@@ -3,7 +3,13 @@ import { App, WatchOptions, InjectionKey } from "vue";
 // augment typings of Vue.js
 import "./vue";
 
-import { mapState, mapMutations, mapGetters, mapActions, createNamespacedHelpers } from "./helpers";
+import {
+  mapState,
+  mapMutations,
+  mapGetters,
+  mapActions,
+  createNamespacedHelpers,
+} from "./helpers";
 import { createLogger } from "./logger";
 
 export * from "./helpers";
@@ -22,12 +28,30 @@ export declare class Store<S> {
   dispatch: Dispatch;
   commit: Commit;
 
-  subscribe<P extends MutationPayload>(fn: (mutation: P, state: S) => any, options?: SubscribeOptions): () => void;
-  subscribeAction<P extends ActionPayload>(fn: SubscribeActionOptions<P, S>, options?: SubscribeOptions): () => void;
-  watch<T>(getter: (state: S, getters: any) => T, cb: (value: T, oldValue: T) => void, options?: WatchOptions): () => void;
+  subscribe<P extends MutationPayload>(
+    fn: (mutation: P, state: S) => any,
+    options?: SubscribeOptions
+  ): () => void;
+  subscribeAction<P extends ActionPayload>(
+    fn: SubscribeActionOptions<P, S>,
+    options?: SubscribeOptions
+  ): () => void;
+  watch<T>(
+    getter: (state: S, getters: any) => T,
+    cb: (value: T, oldValue: T) => void,
+    options?: WatchOptions
+  ): () => void;
 
-  registerModule<T>(path: string, module: Module<T, S>, options?: ModuleOptions): void;
-  registerModule<T>(path: string[], module: Module<T, S>, options?: ModuleOptions): void;
+  registerModule<T>(
+    path: string,
+    module: Module<T, S>,
+    options?: ModuleOptions
+  ): void;
+  registerModule<T>(
+    path: string[],
+    module: Module<T, S>,
+    options?: ModuleOptions
+  ): void;
 
   unregisterModule(path: string): void;
   unregisterModule(path: string[]): void;
@@ -47,11 +71,16 @@ export const storeKey: string;
 
 export function createStore<S>(options: StoreOptions<S>): Store<S>;
 
-export function useStore<S = any>(injectKey?: InjectionKey<Store<S>> | string): Store<S>;
+export function useStore<S = any>(
+  injectKey?: InjectionKey<Store<S>> | string
+): Store<S>;
 
 export interface Dispatch {
   (type: string, payload?: any, options?: DispatchOptions): Promise<any>;
-  <P extends Payload>(payloadWithType: P, options?: DispatchOptions): Promise<any>;
+  <P extends Payload>(
+    payloadWithType: P,
+    options?: DispatchOptions
+  ): Promise<any>;
 }
 
 export interface Commit {
@@ -81,11 +110,15 @@ export interface ActionPayload extends Payload {
 }
 
 export interface SubscribeOptions {
-  prepend?: boolean
+  prepend?: boolean;
 }
 
 export type ActionSubscriber<P, S> = (action: P, state: S) => any;
-export type ActionErrorSubscriber<P, S> = (action: P, state: S, error: Error) => any;
+export type ActionErrorSubscriber<P, S> = (
+  action: P,
+  state: S,
+  error: Error
+) => any;
 
 export interface ActionSubscribersObject<P, S> {
   before?: ActionSubscriber<P, S>;
@@ -93,7 +126,9 @@ export interface ActionSubscribersObject<P, S> {
   error?: ActionErrorSubscriber<P, S>;
 }
 
-export type SubscribeActionOptions<P, S> = ActionSubscriber<P, S> | ActionSubscribersObject<P, S>;
+export type SubscribeActionOptions<P, S> =
+  | ActionSubscriber<P, S>
+  | ActionSubscribersObject<P, S>;
 
 export interface DispatchOptions {
   root?: boolean;
@@ -115,13 +150,22 @@ export interface StoreOptions<S> {
   devtools?: boolean;
 }
 
-export type ActionHandler<S, R> = (this: Store<R>, injectee: ActionContext<S, R>, payload?: any) => any;
+export type ActionHandler<S, R> = (
+  this: Store<R>,
+  injectee: ActionContext<S, R>,
+  payload?: any
+) => any;
 export interface ActionObject<S, R> {
   root?: boolean;
   handler: ActionHandler<S, R>;
 }
 
-export type Getter<S, R> = (state: S, getters: any, rootState: R, rootGetters: any) => any;
+export type Getter<S, R> = (
+  state: S,
+  getters: any,
+  rootState: R,
+  rootGetters: any
+) => any;
 export type Action<S, R> = ActionHandler<S, R> | ActionObject<S, R>;
 export type Mutation<S> = (state: S, payload?: any) => any;
 export type Plugin<S> = (store: Store<S>) => any;
@@ -157,11 +201,11 @@ export interface ModuleTree<R> {
 
 declare const _default: {
   Store: typeof Store;
-  mapState: typeof mapState,
-  mapMutations: typeof mapMutations,
-  mapGetters: typeof mapGetters,
-  mapActions: typeof mapActions,
-  createNamespacedHelpers: typeof createNamespacedHelpers,
-  createLogger: typeof createLogger
+  mapState: typeof mapState;
+  mapMutations: typeof mapMutations;
+  mapGetters: typeof mapGetters;
+  mapActions: typeof mapActions;
+  createNamespacedHelpers: typeof createNamespacedHelpers;
+  createLogger: typeof createLogger;
 };
 export default _default;
