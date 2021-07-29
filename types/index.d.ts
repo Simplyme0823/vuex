@@ -226,16 +226,16 @@ export function createStore<Options extends StoreOptions<any>>(
 ): StricterStore<
   Options extends StoreOptions<infer State> ? State : never,
   NonNullable<Options["getters"]>,
-  NonNullable<Options["mutations"]>,
   NonNullable<Options["actions"]>,
+  NonNullable<Options["mutations"]>,
   NonNullable<Options["modules"]>
 >;
 
 export interface StricterStore<
   RootState,
   Getters extends GetterTree<RootState, RootState>,
-  Mutations extends MutationTree<RootState>,
   Actions extends ActionTree<RootState, RootState>,
+  Mutations extends MutationTree<RootState>,
   Modules extends ModuleTree<RootState>
 > extends Omit<Store<RootState>, "state" | "getters" | "dispatch" | "commit"> {
   readonly state: StoreState<RootState, RootState, Modules>;
